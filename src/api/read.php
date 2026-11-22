@@ -1,6 +1,6 @@
 <?php
 
-require_once "../include.php";
+require_once "../../include.php";
 
 
 function read(string $path, string $query): array
@@ -9,9 +9,9 @@ function read(string $path, string $query): array
     global $dbconn;
     $path_expl = explode("/", trim($path, "/"), 2);
     if (count($path_expl) !== 2) 
-        throw InvalidArgumentException ("desired path: \"/src/table_id?arg=value\"");
+        throw new InvalidArgumentException ("desired path: \"/src/table_id?arg=value\"");
     if ($path_expl[0] !== 'src') 
-        throw InvalidArgumentException ("only allowed to access via \"/src\"");
+        throw new InvalidArgumentException ("only allowed to access via \"/src\"");
 
     $table_id = $path_expl[1];
     $value = null;
@@ -19,14 +19,14 @@ function read(string $path, string $query): array
     [$table, $col] = match ($table_id) {
         "1" => ["students", "id"],
         "2" => ["academic_groups", "name"],
-        "3" => ["faculty", "faculty_abbr"],
-        default => throw InvalidArgumentException ("no such table id");
+        "3" => ["faculties", "name_abbr"],
+        default => throw new InvalidArgumentException ("no such table id"),
     };
     if ($query !== '') {
         if (count(($query_expl = explode("=", $query, 2))) !== 2) 
-            throw InvalidArgumentException ("invalid format of query arguments");
+            throw new InvalidArgumentException ("invalid format of query arguments");
         if ($query_expl[0] !== $col) 
-            throw InvalidArgumentException ("couldnt access table via column {$col}");
+            throw new InvalidArgumentException ("couldnt access table via column {$col}");
         $value = $query_expl[1] ?? null; 
     }
 
