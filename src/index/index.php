@@ -45,8 +45,35 @@ switch ($method) {
             http_response_code(500);
         }
         break;
-#        "PATCH" => "update", 
-#        "DELETE" => 'delete', 
-#        default => fn() => { throw new Exception ("unsupported http method\n"); },
+    case "PATCH":
+        try {
+            $result = update($path, $payload, $query);
+            echo json_encode(["rows_updated" => $result, "success" => true]);
+            http_response_code(200);
+        } catch (InvalidArgumentException $e) {
+            echo json_encode(["error" => $e->getMessage(), "success" => false]);
+            http_response_code(400);
+        } catch (Exception $e) {
+            echo json_encode(["error" => $e->getMessage(), "success" => false]);
+            http_response_code(500);
+        }
+        break;
+    case "DELETE":
+        try {
+            $result = delete($path, $query);
+            echo json_encode(["rows_deleted" => $result, "success" => true]);
+            http_response_code(200);
+        } catch (InvalidArgumentException $e) {
+            echo json_encode(["error" => $e->getMessage(), "success" => false]);
+            http_response_code(400);
+        } catch (Exception $e) {
+            echo json_encode(["error" => $e->getMessage(), "success" => false]);
+            http_response_code(500);
+        }
+        break;
+    default:
+        http_response_code(400); 
+        throw new Exception ("unsupported http method\n");
+        break;
 }
 ?>
