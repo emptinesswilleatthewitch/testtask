@@ -52,8 +52,8 @@ try {
     error_log(date("y:m:d h:i:s") . $e->getMessage(), 3, ERR_LOG_PATH);
     http_response_code(500);
 } catch (Throwable $e) {
-    error_log($e->getMessage(), 3, ERR_LOG_PATH);
     error_log(date("y:m:d h:i:s") . $e->getMessage(), 3, ERR_LOG_PATH);
+    error_log(print_r(debug_stacktrace(), true), 3, ERR_LOG_PATH);
     http_response_code(500);
 }
 ?>
