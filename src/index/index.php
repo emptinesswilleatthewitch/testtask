@@ -17,63 +17,43 @@ $payload = json_decode($raw_payload, true);
 
 if ($payload == '') $payload = [''];
 header('Content-Type: application/json');
-
-switch ($method) {
-    case "GET":
-        try {
+try { 
+    switch ($method) {
+        case "GET":
             $result = read($path, $query);
             echo json_encode(["data" => $result, "success" => true]);
             http_response_code(200);
-        } catch (InvalidArgumentException $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(400);
-        } catch (Exception $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(500);
-        }
-        break;
-    case "POST": 
-        try {
+            break;
+        case "POST": 
             $result = create($path, $payload);
             echo json_encode(["success" => true]);
             http_response_code(201);
-        } catch (InvalidArgumentException $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(400);
-        } catch (Exception $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(500);
-        }
-        break;
-    case "PATCH":
-        try {
+            break;
+        case "PATCH":
             $result = update($path, $payload, $query);
             echo json_encode(["rows_updated" => $result, "success" => true]);
             http_response_code(200);
-        } catch (InvalidArgumentException $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(400);
-        } catch (Exception $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(500);
-        }
-        break;
-    case "DELETE":
-        try {
+            break;
+        case "DELETE":
             $result = delete($path, $query);
             echo json_encode(["rows_deleted" => $result, "success" => true]);
             http_response_code(200);
-        } catch (InvalidArgumentException $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(400);
-        } catch (Exception $e) {
-            echo json_encode(["error" => $e->getMessage(), "success" => false]);
-            http_response_code(500);
-        }
-        break;
-    default:
-        http_response_code(400); 
-        throw new Exception ("unsupported http method\n");
-        break;
+            break;
+        default:
+            throw new InvalidArgumentException ("unsupported http method"); 
+            break;
+    }
+} catch (InvalidArgumentException $e) {
+    echo json_encode(["error" => $e->getMessage(), "success" => false]);
+    error_log($e->getMessage(), 3, ERR_LOG_PATH);
+    http_response_code(400);
+} catch (Exception $e) {
+    echo json_encode(["error" => $e->getMessage(), "success" => false]);
+    error_log($e->getMessage(), 3, ERR_LOG_PATH);
+    http_response_code(500);
+} catch (Throwable $e) {
+    error_log($e->getMessage(), 3, ERR_LOG_PATH);
+    error_log(print_r(debug_stacktrace(), true), 3, ERR_LOG_PATH);
+    http_response_code(500);
 }
 ?>
